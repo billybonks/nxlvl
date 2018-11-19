@@ -1,6 +1,20 @@
 import knex from 'knex';
 
-export default knex({
-  client: 'postgresql',
-  connection: 'postgres://localhost/hollywood_angmoh_development',
-});
+class Connection {
+  public config: any;
+
+  configure(config: {}){
+    this.config = config;
+  }
+
+  getConnection(){
+    console.log(this.config)
+    return knex(this.config);
+  }
+
+  destroy(){
+    this.getConnection().client.pool.destroyer();
+  }
+}
+
+export default new Connection();

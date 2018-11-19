@@ -1,6 +1,5 @@
 import Model from './../model';
 import Attribute from './../attribute';
-import Connection from './../connection';
 
 export interface RelationshipOptions {
   columnName: 'string';

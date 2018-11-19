@@ -13,6 +13,7 @@ class Schema {
       tablesHash[tables[i]] = await getColumns(tables[i]);
     }
     this.tables = tablesHash
+    console.log(tables)
   }
 }
 
@@ -21,7 +22,7 @@ export default new Schema();
 
 async function getColumns(table){
   let query = `select column_name, data_type from information_schema.columns where table_name = '${table}' and table_schema = current_schema()`;
-  let res = await connection.raw(query);
+  let res = await connection.getConnection().raw(query);
   return res.rows.map(function(row){
     return {
       name: row.column_name,
@@ -31,8 +32,9 @@ async function getColumns(table){
 }
 
 async function getTables(){
-  let res = await  connection.raw("select * from information_schema.tables where table_schema = current_schema()");
+  let res = await  connection.getConnection().raw("select * from information_schema.tables where table_schema = current_schema()");
   return res.rows.map((row) => {
     return row.table_name;
   });
+
 }
