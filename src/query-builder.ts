@@ -8,7 +8,6 @@ function instrument(builder, modelClass){
     startTime = Date.now();
   })
   builder.on('query', (options) => {
-    console.log(options.sql)
     cachedQuery = options.sql;
   })
   builder.on('end', (options) => {
