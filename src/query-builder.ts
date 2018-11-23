@@ -39,12 +39,17 @@ function nxlvlThen(builder, modelClass, options){
   }
 }
 
-export default function (modelClass, options) {
-  console.log(modelClass.tableName)
-  let root = connection.getConnection()(modelClass.tableName)
-  instrument.call(this, root, modelClass);
-  if(!options.dontbuild){
+export default {
+  finder(modelClass, options){
+    let root = connection.getConnection()(modelClass.tableName)
+    instrument.call(this, root, modelClass);
     nxlvlThen.call(this, root, modelClass, options);
+    return root
+  },
+
+  modifier(modelClass, options){
+    let root = connection.getConnection()(modelClass.tableName)
+    instrument.call(this, root, modelClass);
+    return root
   }
-  return root
 }

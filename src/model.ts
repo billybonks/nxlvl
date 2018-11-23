@@ -4,7 +4,6 @@ import AttributeSet from './attribute-map';
 import ModelProxyHandler from './model/proxy-handler';
 import BelongsToRelationShip from './relationships/belongs-to-relationship';
 import queryBuilder from './query-builder';
-import { RelationshipOptions } from './relationships/relationship';
 import DatabaseSerializer from './model/database-serializer'
 import { decamelize } from 'humps';
 
@@ -25,10 +24,7 @@ export default class Model {
 		let columns =  Schema.tables[tableName];
 		let attributes = DatabaseSerializer.deserialize(columns, data);
 		this.attributes = new AttributeSet(attributes);
-
 	}
-
-
 
   static get tableName(){
     return `${decamelize(this.name)}s`;
@@ -64,7 +60,7 @@ export default class Model {
   }
 
   root(options = {}) {
-    return queryBuilder(this.constructor, {...options, dontbuild:true});
+    return queryBuilder.modifier(this.constructor, options);
   }
 
 	belongsTo(klass) {
@@ -74,7 +70,7 @@ export default class Model {
 	}
 
   static root(options = {}) {
-    return queryBuilder(this, options);
+    return queryBuilder.finder(this, options);
   }
 
   static select() {
@@ -92,8 +88,4 @@ export default class Model {
   static find(id) {
     return this.root({singular:true}).where('id', id);
   }
-
-	test(){
-		return this.attributes.toHash();
-	}
 }
