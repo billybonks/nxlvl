@@ -8,13 +8,17 @@ export interface AttributeHash {
 }
 
 export default class AttributeMap  {
+	private attributeNames: Map<string, string>;
   private attributes: Map<string, Attribute>;
 
-  constructor(attributes: { [id: string] : {type:string; value:any}; } = {}) {
+  constructor(attributes: { [id: string] : {type:string; name:string; value:any}; } = {}) {
     this.attributes = new Map();
+    this.attributeNames = new Map();
+
     for(let key in attributes){
       let rawAttribute = attributes[key];
-      let attribute = new Attribute(rawAttribute.value, rawAttribute.type);
+      let attribute = new Attribute(rawAttribute.value, rawAttribute.type, rawAttribute.name);
+      this.attributeNames.set(rawAttribute.name, key);
       this.attributes.set(key, attribute);
     }
     return new Proxy(this, AttributeMapProxyHandler);
@@ -28,8 +32,27 @@ export default class AttributeMap  {
     return this.attributes.get(key);
   }
 
+  public apply(hash){
+    for(let key in hash){
+      console.log(key)
+      console.log(hash[key])
+      this.set(key, hash[key]);
+    }
+  }
+
   public set(key:string, attribute:Attribute){
     return this.attributes.set(key, attribute);
+  }
+
+  public toHash() {
+    let hash = {};
+    let itterator = this.attributes.entries();
+    let itteration = itterator.next()
+    while(!itteration.done) {
+      hash[itteration.value[1].name] = itteration.value[1].value;
+      itteration = itterator.next();
+    }
+    return hash;
   }
 
   public isDirty(){

@@ -8,6 +8,7 @@ function instrument(builder, modelClass){
     startTime = Date.now();
   })
   builder.on('query', (options) => {
+    console.log(options.sql)
     cachedQuery = options.sql;
   })
   builder.on('end', (options) => {
@@ -23,6 +24,7 @@ function nxlvlThen(builder, modelClass, options){
   let constructFunction = modelClass;
   builder.then = async function() {
     let promise = new Promise((resolve, reject) => {
+      debugger
       originalThen.call(builder, (results) => {
         let resultObjects = results.map(function(result){
           return new constructFunction(result);
@@ -39,8 +41,11 @@ function nxlvlThen(builder, modelClass, options){
 }
 
 export default function (modelClass, options) {
+  console.log(modelClass.tableName)
   let root = connection.getConnection()(modelClass.tableName)
   instrument.call(this, root, modelClass);
-  nxlvlThen.call(this, root, modelClass, options);
+  if(!options.dontbuild){
+    nxlvlThen.call(this, root, modelClass, options);
+  }
   return root
 }

@@ -6,10 +6,12 @@ export interface AttributeInterface {
 
 export default class Attribute implements AttributeInterface {
   public type: "string";
+  public name: 'string';
   private newValue?: any;
   private originalValue: any;
 
-  constructor(value, type) {
+  constructor(value, type, name) {
+    this.name = name;
     this.type = type;
     this.value = value;
     this.originalValue = value;

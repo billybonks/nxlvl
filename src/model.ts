@@ -4,25 +4,30 @@ import AttributeSet from './attribute-map';
 import ModelProxyHandler from './model/proxy-handler';
 import BelongsToRelationShip from './relationships/belongs-to-relationship';
 import queryBuilder from './query-builder';
-import { camelize, decamelize } from 'humps';
 import { RelationshipOptions } from './relationships/relationship';
+import DatabaseSerializer from './model/database-serializer'
+import { decamelize } from 'humps';
 
 export default class Model {
+	id: any;
 	tableName: string;
   attributes: AttributeSet;
+	databaseSerializer: DatabaseSerializer;
 
   constructor(data = {}){
-		let consttruct = this.constructor as any;
-    let tableName = consttruct.tableName;
-    let columns =  Schema.tables[tableName];
-    let attributes = columns.reduce(function(acc, item){
-      let key = item.name;
-      acc[camelize(key)] = {type:item.type, value:data[key]};
-      return acc;
-    }, {});
-    this.attributes = new AttributeSet(attributes);
+		this.applyData(data)
     return new Proxy(this, ModelProxyHandler);
   }
+
+	private applyData(data){
+		let consttruct = this.constructor as any;
+		let tableName = consttruct.tableName;
+		let columns =  Schema.tables[tableName];
+		let attributes = DatabaseSerializer.deserialize(columns, data);
+		this.attributes = new AttributeSet(attributes);
+
+	}
+
 
 
   static get tableName(){
@@ -30,36 +35,36 @@ export default class Model {
   }
 
   save(){
-    // if(!this.id){
-    //   this.create();
-    // } else {
-    //   this.update();
-    // }
+    if(!this.id){
+      return this.create();
+    } else {
+      return this.update();
+    }
   }
 
   async update(){
     // let d = new Date(Date.now())
     // let date = d.toUTCString();
-    // this._data.updated_at = date;
+    // this.updatedAt = date;
     // return this.root()
-    // .where('id', '=', this._data.id)
+    // .where('id', '=', this.id)
     // .update(this._data).returning('*');
   }
 
-  async create(){
-    // let d = new Date(Date.now())
-    // let date = d.toGMTString();
-    // let data = {
-    //   updated_at: d,
-    //   created_at: d,
-    //   ...this._data,
-    // }
-    // let result = await knex(this.tableName).insert(data).returning('*');
-    // this._data = result[0];
+  async create() {
+    let d = new Date(Date.now())
+    let date = d.toUTCString();
+		let data = {
+			...this.attributes.toHash(),
+			updated_at: date,
+			created_at: date,
+		}
+    let results = await this.root().insert(data).returning('*');
+    this.applyData(results[0]);
   }
 
   root(options = {}) {
-    return queryBuilder(this, options);
+    return queryBuilder(this.constructor, {...options, dontbuild:true});
   }
 
 	belongsTo(klass) {
@@ -87,4 +92,8 @@ export default class Model {
   static find(id) {
     return this.root({singular:true}).where('id', id);
   }
+
+	test(){
+		return this.attributes.toHash();
+	}
 }

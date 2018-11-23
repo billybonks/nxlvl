@@ -1,5 +1,6 @@
 import knex from 'knex';
 
+let knexable = null;
 class Connection {
   public config: any;
 
@@ -8,12 +9,17 @@ class Connection {
   }
 
   getConnection(){
-    console.log(this.config)
-    return knex(this.config);
+    if(knexable){
+      return knexable;
+    } else {
+      knexable = knex(this.config);
+      return knexable;
+    }
   }
 
-  destroy(){
-    this.getConnection().client.pool.destroyer();
+  async destroy(){
+    await this.getConnection().destroy()
+    knexable = null;
   }
 }
 
