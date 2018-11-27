@@ -8,7 +8,7 @@ export interface AttributeHash {
 }
 
 export default class AttributeMap  {
-	private attributeNames: Map<string, string>;
+	attributeNames: Map<string, string>;
   private attributes: Map<string, Attribute>;
 
   constructor(attributes: { [id: string] : {type:string; name:string; value:any}; } = {}) {
@@ -18,10 +18,9 @@ export default class AttributeMap  {
     for(let key in attributes){
       let rawAttribute = attributes[key];
       let attribute = new Attribute(rawAttribute.value, rawAttribute.type, rawAttribute.name);
-      this.attributeNames.set(rawAttribute.name, key);
       this.attributes.set(key, attribute);
     }
-    return new Proxy(this, AttributeMapProxyHandler);
+    // return new Proxy(this, AttributeMapProxyHandler);
   }
 
   public hasKey(key: string){
@@ -30,6 +29,10 @@ export default class AttributeMap  {
 
   public get(key: string){
     return this.attributes.get(key);
+  }
+
+  public getValue(key: string){
+    return this.get(key).value;
   }
 
   public apply(hash){
