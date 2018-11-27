@@ -31,7 +31,8 @@ export default class Model {
   }
 
   save(){
-    if(!this.id){
+		let id = this.attributes.get('id').value;
+    if(!id){
       return this.create();
     } else {
       return this.update();
@@ -39,12 +40,18 @@ export default class Model {
   }
 
   async update(){
-    // let d = new Date(Date.now())
-    // let date = d.toUTCString();
-    // this.updatedAt = date;
-    // return this.root()
-    // .where('id', '=', this.id)
-    // .update(this._data).returning('*');
+		console.log('in update')
+		let model = this as any;
+    let d = new Date(Date.now())
+    let date = d.toUTCString();
+		this.attributes.get('updatedAt').value = date;
+		this.attributes.get('createdAt').value = date;
+		let hash = model.attributes.toHash();
+		let id = hash.id
+		console.log(hash)
+    return this.root()
+    .where('id', '=', id)
+    .update(hash).returning('*');
   }
 
   async create() {
