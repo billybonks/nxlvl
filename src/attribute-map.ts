@@ -16,7 +16,7 @@ export default class AttributeMap  {
 
     for(let key in attributes){
       let rawAttribute = attributes[key];
-      let attribute = new Attribute(rawAttribute.value, rawAttribute.type, rawAttribute.name);
+      let attribute = new Attribute(rawAttribute.value, rawAttribute.type);
       this.attributes.set(key, attribute);
     }
   }
@@ -51,16 +51,6 @@ export default class AttributeMap  {
 
   get entries(){
     return this.attributes.entries.bind(this.attributes)
-  }
-  public toHash() {
-    let hash = {};
-    let itterator = this.attributes.entries();
-    let itteration = itterator.next()
-    while(!itteration.done) {
-      hash[itteration.value[1].name] = itteration.value[1].value;
-      itteration = itterator.next();
-    }
-    return hash;
   }
 
   public isDirty(){
