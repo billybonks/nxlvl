@@ -8,7 +8,6 @@ import DatabaseSerializer from './model/database-serializer'
 import { decamelize } from 'humps';
 
 export default class Model {
-	id: any;
 	tableName: string;
   attributes: AttributeSet;
 	databaseSerializer: DatabaseSerializer;
@@ -26,11 +25,11 @@ export default class Model {
 		this.attributes = new AttributeSet(attributes);
 	}
 
-  static get tableName(){
+  static get tableName() {
     return `${decamelize(this.name)}s`;
   }
 
-  save(){
+  save() {
 		let id = this.attributes.get('id').value;
     if(!id){
       return this.create();
@@ -40,15 +39,11 @@ export default class Model {
   }
 
   async update(){
-		console.log('in update')
-		let model = this as any;
     let d = new Date(Date.now())
     let date = d.toUTCString();
 		this.attributes.get('updatedAt').value = date;
-		this.attributes.get('createdAt').value = date;
-		let hash = model.attributes.toHash();
+		let hash = this.serialize();
 		let id = hash.id
-		console.log(hash)
     return this.root()
     .where('id', '=', id)
     .update(hash).returning('*');
@@ -57,11 +52,9 @@ export default class Model {
   async create() {
     let d = new Date(Date.now())
     let date = d.toUTCString();
-		let data = {
-			...this.attributes.toHash(),
-			updated_at: date,
-			created_at: date,
-		}
+		this.attributes.get('updatedAt').value = date;
+		this.attributes.get('createdAt').value = date;
+		let data = this.serialize();
     let results = await this.root().insert(data).returning('*');
     this.applyData(results[0]);
   }
@@ -76,6 +69,9 @@ export default class Model {
 		this.attributes.set(decamelize(klass.name), relation)
 	}
 
+	serialize() {
+		return DatabaseSerializer.serialize(this.attributes) as any;
+	}
   static root(options = {}) {
     return queryBuilder.finder(this, options);
   }

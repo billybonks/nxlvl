@@ -22,9 +22,6 @@ export default class Serializer {
     }, {});
   }
 
-  static fromDatabaseHash(){
-
-  }
 
   static transformFromDatabaseColumnName(key){
     return camelize(key);

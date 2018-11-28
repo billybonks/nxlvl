@@ -1,5 +1,4 @@
 import Attribute from './attribute';
-import AttributeMapProxyHandler from './attribute-map/proxy-handler';
 import { camelize } from 'humps';
 
 export interface AttributeHash {
@@ -20,7 +19,6 @@ export default class AttributeMap  {
       let attribute = new Attribute(rawAttribute.value, rawAttribute.type, rawAttribute.name);
       this.attributes.set(key, attribute);
     }
-    // return new Proxy(this, AttributeMapProxyHandler);
   }
 
   public hasKey(key: string){
@@ -35,6 +33,10 @@ export default class AttributeMap  {
     return this.get(key).value;
   }
 
+  public setValue(key: string, value: any){
+    return this.get(key).value = value;
+  }
+
   public apply(hash){
     for(let key in hash){
       console.log(key)
@@ -47,6 +49,9 @@ export default class AttributeMap  {
     return this.attributes.set(key, attribute);
   }
 
+  get entries(){
+    return this.attributes.entries.bind(this.attributes)
+  }
   public toHash() {
     let hash = {};
     let itterator = this.attributes.entries();

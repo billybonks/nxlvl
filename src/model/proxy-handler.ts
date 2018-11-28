@@ -9,7 +9,7 @@ get(target, prop, receiver){
   },
 set(target, prop, value) {
     if(target.attributes.hasKey(prop)){
-      return target.attributes[prop] = value;
+      return target.attributes.setValue(prop, value)
     }
   }
 }
