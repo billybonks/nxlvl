@@ -17,17 +17,24 @@ export default class Model {
     return new Proxy(this, ModelProxyHandler);
   }
 
-	private applyData(data){
-		let consttruct = this.constructor as any;
-		let tableName = consttruct.tableName;
+	static get schema(){
+		let tableName = this.tableName;
 		let columns =  Schema.tables[tableName];
+		return {
+			tableName,
+			columns
+		}
+	}
+	private applyData(data){
+		let stat = this.constructor as any;
+		let {tableName, columns} = stat.schema;
 		let attributes = DatabaseSerializer.deserialize(columns, data);
 		this.attributes = new AttributeSet(attributes);
 	}
 
-  static get tableName() {
-    return `${decamelize(this.name)}s`;
-  }
+	static get tableName(){
+		return DatabaseSerializer.tableName(this);
+	}
 
   save() {
 		let id = this.attributes.get('id').value;
