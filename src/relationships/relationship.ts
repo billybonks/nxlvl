@@ -7,7 +7,7 @@ export interface RelationshipOptions {
 }
 
 
-export default class Relationship extends Attribute {
+export default abstract class Relationship extends Attribute {
   protected options: {columnName: string, tableName: string};
   protected klass: Model;
   protected isLoaded: boolean;
@@ -36,22 +36,15 @@ export default class Relationship extends Attribute {
   }
 
   public get value() {
-    if(!this.isLoaded) {
-      let value = this.load();
-      this.value = value;
-    }
-    return Promise.resolve(super.value);
+    return this.query();
   }
 
   public set value(value) {
     super.value = value;
   }
 
-  protected async load(){
-    let klass = this.klass as any;
-    let value = await klass.find(this.forigenAttribute.value)
-    this.isLoaded = true;
-    return value;
-  }
+	protected query(): any {
+		throw new Error("Method not implemented.");
+	}
 
 }

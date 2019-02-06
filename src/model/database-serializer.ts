@@ -1,4 +1,5 @@
 import { camelize, decamelize } from 'humps';
+import  Relationship from './../relationships/relationship';
 
 export default class Serializer {
   static serialize(attributes) {
@@ -7,7 +8,12 @@ export default class Serializer {
     let itteration = itterator.next()
     while(!itteration.done) {
       let key = this.transformToDatabaseColumnName(itteration.value[0])
-      hash[key] = itteration.value[1].value;
+      let attribute = itteration.value[1] as any
+      if(attribute instanceof Relationship) {
+        //no-op
+      } else {
+        hash[key] = itteration.value[1].value;
+      }
       itteration = itterator.next();
     }
     return hash;

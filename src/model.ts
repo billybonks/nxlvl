@@ -2,7 +2,8 @@
 import Schema from './schema';
 import AttributeSet from './attribute-map';
 import ModelProxyHandler from './model/proxy-handler';
-import BelongsToRelationShip from './relationships/belongs-to-relationship';
+import BelongsToRelationship from './relationships/belongs-to-relationship';
+import HasManyRelationship from './relationships/has-many-relationship';
 import queryBuilder from './query-builder';
 import DatabaseSerializer from './model/database-serializer'
 import { decamelize } from 'humps';
@@ -70,10 +71,16 @@ export default class Model {
     return queryBuilder.modifier(this.constructor, options);
   }
 
-	belongsTo(klass) {
-		let relation = new BelongsToRelationShip(klass,  {columnName: null, tableName: null});
+	belongsTo(klass, options = {columnName: null, tableName: null}) {
+		let relation = new BelongsToRelationship(klass,  options);
 		relation.forigenAttribute = this.attributes.get(relation.columnName);
 		this.attributes.set(decamelize(klass.name), relation)
+	}
+
+	hasMany(klass, options = {columnName: null, tableName: null}) {
+		let relation = new HasManyRelationship(klass,  options);
+		relation.forigenAttribute = this.attributes.get('id');
+		this.attributes.set(decamelize(klass.name)+'s', relation)
 	}
 
 	serialize() {
@@ -91,8 +98,8 @@ export default class Model {
     return this.root()
   }
 
-  static where() {
-    return this.root().all();
+  static where(options) {
+    return this.root().where(options);
   }
 
   static find(id) {

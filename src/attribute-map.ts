@@ -39,8 +39,6 @@ export default class AttributeMap  {
 
   public apply(hash){
     for(let key in hash){
-      console.log(key)
-      console.log(hash[key])
       this.set(key, hash[key]);
     }
   }

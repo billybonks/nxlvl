@@ -13,7 +13,6 @@ class Schema {
       tablesHash[tables[i]] = await getColumns(tables[i]);
     }
     this.tables = tablesHash
-    console.log(tables)
   }
 }
 
