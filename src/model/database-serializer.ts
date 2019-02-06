@@ -23,6 +23,10 @@ export default class Serializer {
   }
 
 
+  static tableName(klass) {
+    return `${decamelize(klass.name)}s`;
+  }
+
   static transformFromDatabaseColumnName(key){
     return camelize(key);
   }
