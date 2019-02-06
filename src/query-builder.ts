@@ -10,6 +10,10 @@ function instrument(builder, modelClass){
   builder.on('query', (options) => {
     cachedQuery = options.sql;
   })
+  builder.on('error', (options) => {
+    let model = chalk.bold(chalk`{red ERROR} {red ${modelClass.name}}`)
+    console.log(chalk`${model} {red ${cachedQuery}}`);
+  })
   builder.on('end', (options) => {
     let endTime = Date.now();
     let delta = endTime - startTime;
